@@ -1,0 +1,57 @@
+name: Cucumber BDD
+
+on:
+  push:
+    branches:
+      - cucumber-bdd-pom
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: ${{ matrix.suite }} on Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20']
+        suite: ['smoke', 'regression']
+    env:
+      BASE_URL: https://app.thetestingacademy.com/playwright/ttacart/index.html
+      NODE_ENV: prod
+      CI: true
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Cucumber suite
+        run: npm run test:${{ matrix.suite }}
+
+      - name: Upload Cucumber report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-${{ matrix.suite }}-report
+          path: |
+            reports/
+            screenshots/
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-screenshots-${{ matrix.suite }}
+          path: screenshots/
+          if-no-files-found: ignore

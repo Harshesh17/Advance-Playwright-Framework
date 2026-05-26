@@ -1,40 +1,24 @@
-# Dependencies
 node_modules/
-
-# Build output
 dist/
-
-# Test results
-test-results/
+reports/
+screenshots/
+videos/
 playwright-report/
-playwright/.cache/
+test-results/
+.cucumber/
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# Local env files but keep example
+.env
+.env.dev
+.env.staging
+.env.prod
+!.env.example
 
-# Environment
-.env.local
-.env.*.local
-
-# OS
+# Editor + OS
 .DS_Store
-Thumbs.db
-
-# Logs
+.vscode/
+.idea/
 *.log
 npm-debug.log*
-logs/
-
-# Coverage
-coverage/
-
-# Allure
-allure-results/
-allure-report/
-
-# Custom TTA reporter output
-tta-report/
-
+yarn-debug.log*
+yarn-error.log*
