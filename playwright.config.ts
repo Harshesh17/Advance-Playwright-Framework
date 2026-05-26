@@ -42,8 +42,11 @@ function resolveBaseURL(): string {
 
 const isCI = !!process.env.CI;
 
+const BOOKER_URL = process.env.BOOKER_URL || 'https://restful-booker.herokuapp.com';
+const SPOTIFY_API_URL = process.env.SPOTIFY_API_URL || 'https://api.spotify.com';
+
 export default defineConfig({
-    testDir: './src/tests',
+    testDir: '.',
     timeout: 60_000,
     expect: { timeout: 10_000 },
     fullyParallel: true,
@@ -52,10 +55,8 @@ export default defineConfig({
     workers: isCI ? 4 : 6,
 
     reporter: [
-        ['./src/utils/CustomTTAReporter.ts'],
         ['html', { open: 'never' }],
         ['json', { outputFile: 'test-results/results.json' }],
-        ['allure-playwright', { outputFolder: 'allure-results' }],
         ['list'],
     ],
 
@@ -69,9 +70,33 @@ export default defineConfig({
     },
 
     projects: [
-        { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-        { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-        { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-        { name: 'mobile-chrome', use: { ...devices['Pixel 5'] } },
+        {
+            name: 'api-restful-booker',
+            testDir: './tests',
+            testIgnore: ['**/oauth2-spotify.spec.ts'],
+            use: {
+                baseURL: BOOKER_URL,
+                extraHTTPHeaders: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+            },
+        },
+        {
+            name: 'api-spotify',
+            testDir: './tests/auth-schema',
+            testMatch: ['**/oauth2-spotify.spec.ts'],
+            use: {
+                baseURL: SPOTIFY_API_URL,
+                extraHTTPHeaders: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+            },
+        },
+        { name: 'chromium', testDir: './src/tests', use: { ...devices['Desktop Chrome'] } },
+        { name: 'firefox', testDir: './src/tests', use: { ...devices['Desktop Firefox'] } },
+        { name: 'webkit', testDir: './src/tests', use: { ...devices['Desktop Safari'] } },
+        { name: 'mobile-chrome', testDir: './src/tests', use: { ...devices['Pixel 5'] } },
     ],
 });

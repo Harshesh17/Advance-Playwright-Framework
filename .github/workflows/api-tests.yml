@@ -1,0 +1,98 @@
+name: API Tests
+
+on:
+  push:
+    branches: [api-testing-pw, ttacart, main]
+  pull_request:
+    branches: [main, ttacart]
+  workflow_dispatch:
+
+jobs:
+  api-restful-booker:
+    name: Restful Booker (CRUD + Auth + Network)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Warm up Restful Booker (Heroku free dyno cold-start)
+        # The free dyno sleeps after 30 minutes of inactivity. A single
+        # /ping here wakes it up so the first real test doesn't eat the
+        # cold-start latency and trip the response-time budget.
+        run: |
+          for i in 1 2 3; do
+            curl -fsS --max-time 30 https://restful-booker.herokuapp.com/ping && break
+            echo "warm-up attempt $i failed, retrying..."
+            sleep 5
+          done
+
+      - name: Run Restful Booker API tests
+        env:
+          BOOKER_URL: https://restful-booker.herokuapp.com
+          BOOKER_USER: admin
+          BOOKER_PASS: password123
+          # Give CI a wider budget than local dev because shared GH runners
+          # are noisy.
+          API_RESPONSE_TIME_BUDGET_MS: 5000
+        run: npx playwright test --project=api-restful-booker
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-booker
+          path: playwright-report/
+          retention-days: 7
+
+  api-spotify:
+    name: Spotify (OAuth2 client_credentials)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # The Spotify suite needs real client creds. We gate it behind secret
+    # presence so a fork PR (which can't read secrets) just skips this job
+    # instead of failing.
+    if: ${{ vars.RUN_SPOTIFY_TESTS == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Spotify OAuth2 tests
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_API_URL: https://api.spotify.com
+          SPOTIFY_TOKEN_URL: https://accounts.spotify.com/api/token
+        run: npx playwright test --project=api-spotify
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-spotify
+          path: playwright-report/
+          retention-days: 7

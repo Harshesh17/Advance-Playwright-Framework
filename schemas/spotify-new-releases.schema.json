@@ -1,0 +1,52 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://thetestingacademy.com/schemas/spotify-new-releases.schema.json",
+    "title": "SpotifyNewReleases",
+    "description": "Subset of Spotify Web API GET /v1/browse/new-releases response. We only assert on the fields we actually care about so Spotify can add new fields without breaking us.",
+    "type": "object",
+    "required": ["albums"],
+    "additionalProperties": true,
+    "properties": {
+        "albums": {
+            "type": "object",
+            "required": ["href", "items", "limit", "total"],
+            "additionalProperties": true,
+            "properties": {
+                "href": {
+                    "type": "string",
+                    "format": "uri"
+                },
+                "limit": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "total": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["id", "name", "type"],
+                        "additionalProperties": true,
+                        "properties": {
+                            "id": { "type": "string" },
+                            "name": { "type": "string" },
+                            "type": { "type": "string", "enum": ["album"] },
+                            "album_type": { "type": "string" },
+                            "artists": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "required": ["id", "name"],
+                                    "additionalProperties": true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

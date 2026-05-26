@@ -1,0 +1,44 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://thetestingacademy.com/schemas/booking.schema.json",
+    "title": "Booking",
+    "description": "Restful Booker - booking object shape returned by GET /booking/{id} and inside the `booking` property of POST /booking.",
+    "type": "object",
+    "required": ["firstname", "lastname", "totalprice", "depositpaid", "bookingdates"],
+    "additionalProperties": true,
+    "properties": {
+        "firstname": {
+            "type": "string",
+            "minLength": 1
+        },
+        "lastname": {
+            "type": "string",
+            "minLength": 1
+        },
+        "totalprice": {
+            "type": "number",
+            "minimum": 0
+        },
+        "depositpaid": {
+            "type": "boolean"
+        },
+        "bookingdates": {
+            "type": "object",
+            "required": ["checkin", "checkout"],
+            "additionalProperties": false,
+            "properties": {
+                "checkin": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "checkout": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                }
+            }
+        },
+        "additionalneeds": {
+            "type": "string"
+        }
+    }
+}
