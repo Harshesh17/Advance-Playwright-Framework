@@ -2,7 +2,6 @@
 
 A modular, scalable test automation framework built with **Playwright** and **TypeScript** using the **Page Object Model (POM)** and **Module Pattern** architecture.
 
-> **Created by [Pramod Dutta](https://thetestingacademy.com)** | [The Testing Academy](https://thetestingacademy.com)
 
 ---
 
@@ -436,9 +435,7 @@ This framework includes a **Custom TTA Reporter** - a beautiful, modern HTML rep
 
 ### Report Screenshot
 
-<p align="center">
-  <img src="docs/images/report.png" alt="TTA Custom Reporter Screenshot" width="800"/>
-</p>
+
 
 ### Usage
 
@@ -706,14 +703,6 @@ ISC
 
 ---
 
-## 👨‍💻 Author
 
-**Pramod Dutta**
-- Website: [thetestingacademy.com](https://thetestingacademy.com)
-- GitHub: [@PramodDutta](https://github.com/PramodDutta)
 
 ---
-
-<p align="center">
-  Built with ❤️ by <a href="https://thetestingacademy.com">The Testing Academy</a>
-</p>
