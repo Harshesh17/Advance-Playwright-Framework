@@ -41,14 +41,14 @@ jobs:
         run: npm ci
 
       - name: 🎭 Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        run: npm playwright install --with-deps chromium
 
       - name: 🧪 Run Playwright Tests (Shard ${{ matrix.shard }}/4)
         run: |
           if [ -n "${{ github.event.inputs.test_tag }}" ]; then
-            npx playwright test --shard=${{ matrix.shard }}/4 --grep "${{ github.event.inputs.test_tag }}"
+            npm playwright test --shard=${{ matrix.shard }}/4 --grep "${{ github.event.inputs.test_tag }}"
           else
-            npx playwright test --shard=${{ matrix.shard }}/4
+            npm playwright test --shard=${{ matrix.shard }}/4
           fi
 
       - name: 📊 Upload Test Results
